@@ -3,13 +3,14 @@ fragment_size: 100
 device: CUDA:0
 engine: tensor
 multiprocessing: false
-path_dataset: ''
+path_dataset: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d'
+path_trajectory: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/extrinsics.log'
 depth_folder: depth
 color_folder: color
-path_intrinsic: ''
-path_color_intrinsic: ''
+path_intrinsic: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/intrinsics.json'
+path_color_intrinsic: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/intrinsics.json'
 depth_min: 0.1
-depth_max: 3.0
+depth_max: 4.0
 depth_scale: 1000.0
 odometry_method: hybrid
 odometry_loop_interval: 10
@@ -21,7 +22,7 @@ icp_distance_thr: 0.07
 global_registration_method: ransac
 registration_loop_weight: 0.1
 integrate_color: true
-voxel_size: 0.0058
+voxel_size: 0.004
 trunc_voxel_multiplier: 8.0
 block_count: 40000
 est_point_count: 6000000

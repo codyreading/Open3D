@@ -143,34 +143,35 @@ def custom_draw_geometry_with_camera_trajectory(pcd, render_option_path,
 
 if __name__ == "__main__":
     sample_data = o3d.data.DemoCustomVisualization()
-    pcd_flipped = o3d.io.read_point_cloud(sample_data.point_cloud_path)
-    # Flip it, otherwise the pointcloud will be upside down
-    pcd_flipped.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0],
-                           [0, 0, 0, 1]])
+    # pcd_flipped = o3d.io.read_point_cloud(sample_data.point_cloud_path)
+    # # Flip it, otherwise the pointcloud will be upside down
+    # pcd_flipped.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0],
+    #                        [0, 0, 0, 1]])
 
-    print("1. Customized visualization to mimic DrawGeometry")
-    custom_draw_geometry(pcd_flipped)
+    # print("1. Customized visualization to mimic DrawGeometry")
+    # custom_draw_geometry(pcd_flipped)
 
-    print("2. Changing field of view")
-    custom_draw_geometry_with_custom_fov(pcd_flipped, 90.0)
-    custom_draw_geometry_with_custom_fov(pcd_flipped, -90.0)
+    # print("2. Changing field of view")
+    # custom_draw_geometry_with_custom_fov(pcd_flipped, 90.0)
+    # custom_draw_geometry_with_custom_fov(pcd_flipped, -90.0)
 
-    print("3. Customized visualization with a rotating view")
-    custom_draw_geometry_with_rotation(pcd_flipped)
+    # print("3. Customized visualization with a rotating view")
+    # custom_draw_geometry_with_rotation(pcd_flipped)
 
-    print("4. Customized visualization showing normal rendering")
-    custom_draw_geometry_load_option(pcd_flipped,
-                                     sample_data.render_option_path)
+    # print("4. Customized visualization showing normal rendering")
+    # custom_draw_geometry_load_option(pcd_flipped,
+    #                                  sample_data.render_option_path)
 
-    print("5. Customized visualization with key press callbacks")
-    print("   Press 'K' to change background color to black")
-    print("   Press 'R' to load a customized render option, showing normals")
-    print("   Press ',' to capture the depth buffer and show it")
-    print("   Press '.' to capture the screen and show it")
-    custom_draw_geometry_with_key_callback(pcd_flipped,
-                                           sample_data.render_option_path)
-
-    pcd = o3d.io.read_point_cloud(sample_data.point_cloud_path)
+    # print("5. Customized visualization with key press callbacks")
+    # print("   Press 'K' to change background color to black")
+    # print("   Press 'R' to load a customized render option, showing normals")
+    # print("   Press ',' to capture the depth buffer and show it")
+    # print("   Press '.' to capture the screen and show it")
+    # custom_draw_geometry_with_key_callback(pcd_flipped,
+    #                                        sample_data.render_option_path)
+    camera_trajectory_path = '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/extrinsics.log'
+    point_cloud_path = '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/point_cloud.ply'
+    pcd = o3d.io.read_point_cloud(point_cloud_path)
     print("6. Customized visualization playing a camera trajectory")
     custom_draw_geometry_with_camera_trajectory(
-        pcd, sample_data.render_option_path, sample_data.camera_trajectory_path)
+        pcd, sample_data.render_option_path, camera_trajectory_path)
