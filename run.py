@@ -55,7 +55,8 @@ if __name__ == "__main__":
         color_type=o3d.pipelines.integration.TSDFVolumeColorType.RGB8,
     )
 
-    for i in range(len(camera_poses)):
+    pcds = []
+    for i in range(len(camera_poses[:5])):
         print("Integrate {:d}-th image into the volume.".format(i))
         color = o3d.io.read_image(color_paths[i])
         depth = o3d.io.read_image(depth_paths[i])
@@ -65,12 +66,14 @@ if __name__ == "__main__":
         
 
         
-        # pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
-        #         rgbd,
-        #         camera_intrinsics)
-        # # Flip it, otherwise the pointcloud will be upside down
-        # pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-        # o3d.visualization.draw_geometries([pcd])
+        pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
+                rgbd,
+                camera_intrinsics)
+        transform = camera_poses[i]
+        pcd.transform(transform)
+        # Flip it, otherwise the pointcloud will be upside down
+        #pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+        pcds.append(pcd)
                 
         # plt.subplot(1, 2, 1)
         # plt.title('image')
@@ -86,11 +89,17 @@ if __name__ == "__main__":
             np.linalg.inv(camera_poses[i]),
         )
 
-    print("Extract triangle mesh")
-    mesh = volume.extract_triangle_mesh()
-    mesh.compute_vertex_normals()
-    o3d.visualization.draw_geometries([mesh])
+    print("Visualize depth point clouds")
+    o3d.visualization.draw_geometries(pcds)
 
-    print("Extract voxel-aligned debugging point cloud")
-    voxel_pcd = volume.extract_voxel_point_cloud()
-    o3d.visualization.draw_geometries([voxel_pcd])
+
+    # print("Extract triangle mesh")
+    # mesh = volume.extract_triangle_mesh()
+    # mesh.compute_vertex_normals()
+    # mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    # o3d.visualization.draw_geometries([mesh])
+
+    # print("Extract voxel-aligned debugging point cloud")
+    # voxel_pcd = volume.extract_voxel_point_cloud()
+    # voxel_pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    # o3d.visualization.draw_geometries([voxel_pcd])
