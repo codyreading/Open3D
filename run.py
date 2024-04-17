@@ -92,7 +92,7 @@ def translation_matrix(axis, translation):
 
 
 if __name__ == "__main__":
-    exp = "teapot_001@20240409-035530"
+    exp = "lambo@20240409-035219"
 
     voxel_length = 0.004
     sdf_trunc = 0.02
