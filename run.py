@@ -92,7 +92,7 @@ def translation_matrix(axis, translation):
 
 
 if __name__ == "__main__":
-    exp = "lambo@20240409-035219"
+    exp = "teapot_001@20240409-035530"
 
     voxel_length = 0.004
     sdf_trunc = 0.02
@@ -140,16 +140,16 @@ if __name__ == "__main__":
             np.linalg.inv(camera_poses[i]),
         )
 
-     # Step 1 - Get scene objects
-    meshFrame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0, origin=[0, 0, 0])
+    #  # Step 1 - Get scene objects
+    # meshFrame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0, origin=[0, 0, 0])
 
-    print("Visualize depth point clouds")
-    o3d.visualization.draw_geometries(pcds + [meshFrame,])
+    # print("Visualize depth point clouds")
+    # o3d.visualization.draw_geometries(pcds + [meshFrame,])
 
-    # print("Extract triangle mesh")
+    # # print("Extract triangle mesh")
     mesh = volume.extract_triangle_mesh()
     mesh.compute_vertex_normals()
-    mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-    o3d.visualization.draw_geometries([mesh])
+    # mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    # o3d.visualization.draw_geometries([mesh])
 
-    o3d.io.write_triangle_mesh(mesh=mesh, filename="lambo_tsdf.glb")
+    o3d.io.write_triangle_mesh(mesh=mesh, filename="teapot_tsdf_nocolor.glb", write_vertex_colors=False, write_triangle_uvs=False)
