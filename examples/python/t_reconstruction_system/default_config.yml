@@ -3,12 +3,12 @@ fragment_size: 100
 device: CUDA:0
 engine: tensor
 multiprocessing: false
-path_dataset: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d'
-path_trajectory: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/extrinsics.log'
+path_dataset: ''
+path_trajectory: ''
 depth_folder: depth
 color_folder: color
-path_intrinsic: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/intrinsics.json'
-path_color_intrinsic: '/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d/intrinsics.json'
+path_intrinsic: ''
+path_color_intrinsic: ''
 depth_min: 0.1
 depth_max: 4.0
 depth_scale: 1000.0
