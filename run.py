@@ -116,11 +116,6 @@ if __name__ == "__main__":
 
     pcds = []
 
-    distance = 3.0
-
-    translation = translation_matrix(axis="Z", translation=-distance)
-    rotations = np.arange(0, 360, 3, dtype=np.int32)
-
     for i in range(len(camera_poses)):
         print("Integrate {:d}-th image into the volume.".format(i))
         color = o3d.io.read_image(color_paths[i])
@@ -129,32 +124,18 @@ if __name__ == "__main__":
         rgbd = o3d.geometry.RGBDImage.create_from_color_and_depth(
             color, depth, depth_trunc=depth_max, convert_rgb_to_intensity=False)
         
-
-        
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
                 rgbd,
                 camera_intrinsics)
-        #transform = np.linalg.inv(camera_poses[i])
 
-        rotation = rotation_matrix(angle=-1*rotations[i], axis="Y")
-        transform = rotation @ translation
-        pcd.transform(transform)
-        # Flip it, otherwise the pointcloud will be upside down
-        #pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+        pcd.transform(camera_poses[i])
+        pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
         pcds.append(pcd)
                 
-        # plt.subplot(1, 2, 1)
-        # plt.title('image')
-        # plt.imshow(rgbd.color)
-        # plt.subplot(1, 2, 2)
-        # plt.title('depth image')
-        # plt.imshow(rgbd.depth)
-        # plt.show()
-
         volume.integrate(
             rgbd,
             camera_intrinsics,
-            np.linalg.inv(transform),
+            np.linalg.inv(camera_poses[i]),
         )
 
      # Step 1 - Get scene objects
@@ -168,8 +149,3 @@ if __name__ == "__main__":
     mesh.compute_vertex_normals()
     mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
     o3d.visualization.draw_geometries([mesh])
-
-    print("Extract voxel-aligned debugging point cloud")
-    voxel_pcd = volume.extract_voxel_point_cloud()
-    voxel_pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-    o3d.visualization.draw_geometries([voxel_pcd])
