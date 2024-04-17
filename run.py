@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import os, sys
+from tqdm import tqdm
 from pathlib import Path
 
 pyexample_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -91,10 +92,12 @@ def translation_matrix(axis, translation):
 
 
 if __name__ == "__main__":
+    exp = "teapot_001@20240409-035530"
+
     voxel_length = 0.004
     sdf_trunc = 0.02
     depth_max = 6
-    data_dir = Path("/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights/teapot_001@20240409-035530/save/open3d")
+    data_dir = Path("/home/cra80/Projects/threestudio-sketch/outputs/mvdream+sd-increased_weights") / exp / "save" / "open3d"
 
     color_dir = data_dir / "color"
     depth_dir = data_dir / "depth"
@@ -116,8 +119,7 @@ if __name__ == "__main__":
 
     pcds = []
 
-    for i in range(len(camera_poses)):
-        print("Integrate {:d}-th image into the volume.".format(i))
+    for i in tqdm(range(len(camera_poses)), desc="Generating volume"):
         color = o3d.io.read_image(color_paths[i])
         depth = o3d.io.read_image(depth_paths[i])
 
@@ -144,8 +146,10 @@ if __name__ == "__main__":
     print("Visualize depth point clouds")
     o3d.visualization.draw_geometries(pcds + [meshFrame,])
 
-    print("Extract triangle mesh")
+    # print("Extract triangle mesh")
     mesh = volume.extract_triangle_mesh()
     mesh.compute_vertex_normals()
     mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
     o3d.visualization.draw_geometries([mesh])
+
+    o3d.io.write_triangle_mesh(mesh=mesh, filename="lambo_tsdf.glb")
