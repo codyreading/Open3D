@@ -31,6 +31,65 @@ def read_trajectory(extrinsics_dir):
     return traj
 
 
+def rotation_matrix(axis, angle):
+    """
+    Compute a 3D rotation matrix given an axis (X, Y, or Z) and an angle in degrees.
+    """
+    angle_rad = np.radians(angle)
+    if axis == 'X':
+        return np.array([
+            [1, 0, 0, 0],
+            [0, np.cos(angle_rad), -np.sin(angle_rad), 0],
+            [0, np.sin(angle_rad), np.cos(angle_rad), 0],
+            [0, 0, 0, 1]
+        ])
+    elif axis == 'Y':
+        return np.array([
+            [np.cos(angle_rad), 0, np.sin(angle_rad), 0],
+            [0, 1, 0, 0],
+            [-np.sin(angle_rad), 0, np.cos(angle_rad), 0],
+            [0, 0, 0, 1]
+        ])
+    elif axis == 'Z':
+        return np.array([
+            [np.cos(angle_rad), -np.sin(angle_rad), 0, 0],
+            [np.sin(angle_rad), np.cos(angle_rad), 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ])
+    else:
+        raise ValueError("Invalid axis. Please choose 'X', 'Y', or 'Z'.")
+
+
+def translation_matrix(axis, translation):
+    """
+    Compute a 3D translation matrix given an axis (X, Y, or Z) and a translation in meters.
+    """
+    if axis == 'X':
+        return np.array([
+            [1, 0, 0, translation],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ])
+    elif axis == 'Y':
+        return np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, translation],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ])
+    elif axis == 'Z':
+        return np.array([
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, translation],
+            [0, 0, 0, 1]
+        ])
+    else:
+        raise ValueError("Invalid axis. Please choose 'X', 'Y', or 'Z'.")
+
+
 if __name__ == "__main__":
     voxel_length = 0.004
     sdf_trunc = 0.02
@@ -56,7 +115,13 @@ if __name__ == "__main__":
     )
 
     pcds = []
-    for i in range(len(camera_poses[:5])):
+
+    distance = 3.0
+
+    translation = translation_matrix(axis="Z", translation=-distance)
+    rotations = np.arange(0, 360, 3, dtype=np.int32)
+
+    for i in range(len(camera_poses)):
         print("Integrate {:d}-th image into the volume.".format(i))
         color = o3d.io.read_image(color_paths[i])
         depth = o3d.io.read_image(depth_paths[i])
@@ -69,7 +134,10 @@ if __name__ == "__main__":
         pcd = o3d.geometry.PointCloud.create_from_rgbd_image(
                 rgbd,
                 camera_intrinsics)
-        transform = camera_poses[i]
+        #transform = np.linalg.inv(camera_poses[i])
+
+        rotation = rotation_matrix(angle=-1*rotations[i], axis="Y")
+        transform = rotation @ translation
         pcd.transform(transform)
         # Flip it, otherwise the pointcloud will be upside down
         #pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
@@ -86,20 +154,22 @@ if __name__ == "__main__":
         volume.integrate(
             rgbd,
             camera_intrinsics,
-            np.linalg.inv(camera_poses[i]),
+            np.linalg.inv(transform),
         )
 
+     # Step 1 - Get scene objects
+    meshFrame = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1.0, origin=[0, 0, 0])
+
     print("Visualize depth point clouds")
-    o3d.visualization.draw_geometries(pcds)
+    o3d.visualization.draw_geometries(pcds + [meshFrame,])
 
+    print("Extract triangle mesh")
+    mesh = volume.extract_triangle_mesh()
+    mesh.compute_vertex_normals()
+    mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    o3d.visualization.draw_geometries([mesh])
 
-    # print("Extract triangle mesh")
-    # mesh = volume.extract_triangle_mesh()
-    # mesh.compute_vertex_normals()
-    # mesh.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-    # o3d.visualization.draw_geometries([mesh])
-
-    # print("Extract voxel-aligned debugging point cloud")
-    # voxel_pcd = volume.extract_voxel_point_cloud()
-    # voxel_pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
-    # o3d.visualization.draw_geometries([voxel_pcd])
+    print("Extract voxel-aligned debugging point cloud")
+    voxel_pcd = volume.extract_voxel_point_cloud()
+    voxel_pcd.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]])
+    o3d.visualization.draw_geometries([voxel_pcd])
